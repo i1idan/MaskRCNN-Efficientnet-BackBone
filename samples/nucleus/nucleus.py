@@ -464,31 +464,31 @@ if __name__ == '__main__':
                                   model_dir=args.logs,
                                   pretrained = args.pretrained, model_name = args.model)
 
-    # Select weights file to load
-    if args.weights.lower() == "coco":
-        weights_path = COCO_WEIGHTS_PATH
-        # Download weights file
-        if not os.path.exists(weights_path):
-            utils.download_trained_weights(weights_path)
-    elif args.weights.lower() == "last":
-        # Find last trained weights
-        weights_path = model.find_last()
-    elif args.weights.lower() == "imagenet":
-        # Start from ImageNet trained weights
-        weights_path = model.get_imagenet_weights()
-    else:
-        weights_path = args.weights
+#     # Select weights file to load
+#     if args.weights.lower() == "coco":
+#         weights_path = COCO_WEIGHTS_PATH
+#         # Download weights file
+#         if not os.path.exists(weights_path):
+#             utils.download_trained_weights(weights_path)
+#     elif args.weights.lower() == "last":
+#         # Find last trained weights
+#         weights_path = model.find_last()
+#     elif args.weights.lower() == "imagenet":
+#         # Start from ImageNet trained weights
+#         weights_path = model.get_imagenet_weights()
+#     else:
+#         weights_path = args.weights
 
-    # Load weights
-    print("Loading weights ", weights_path)
-    if args.weights.lower() == "coco":
-        # Exclude the last layers because they require a matching
-        # number of classes
-        model.load_weights(weights_path, by_name=True, exclude=[
-            "mrcnn_class_logits", "mrcnn_bbox_fc",
-            "mrcnn_bbox", "mrcnn_mask"])
-    else:
-        model.load_weights(weights_path, by_name=True)
+#     # Load weights
+#     print("Loading weights ", weights_path)
+#     if args.weights.lower() == "coco":
+#         # Exclude the last layers because they require a matching
+#         # number of classes
+#         model.load_weights(weights_path, by_name=True, exclude=[
+#             "mrcnn_class_logits", "mrcnn_bbox_fc",
+#             "mrcnn_bbox", "mrcnn_mask"])
+#     else:
+#         model.load_weights(weights_path, by_name=True)
 
     # Train or evaluate
     if args.command == "train":
