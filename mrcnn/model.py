@@ -33,7 +33,16 @@ from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 
-
+# importing the sys module
+import sys
+ 
+# the setrecursionlimit function is
+# used to modify the default recursion
+# limit set by python. Using this,
+# we can increase the recursion limit
+# to satisfy our needs
+ 
+sys.setrecursionlimit(10**6)
 ############################################################
 #  Utility Functions
 ############################################################
@@ -1077,18 +1086,62 @@ def preprocess_input(x, data_format=None, **kwargs):
                                            mode='torch', **kwargs)
 
 
+
 # class effnet which will be faster
 
 class EfficientNetBase(object):
   def __init__(self,
-               pretrained=True,):
+               pretrained=True,
+               model_type='B6'):
     if pretrained:
       weights = 'imagenet'
     else:
       weights = None
-    self.net = EfficientNetB6(include_top=False, weights=weights,
-                              input_shape=(224, 224, 3),
-                              classes=1000, pooling=None,)
+
+    if model_type == 'B0':
+      self.net = EfficientNetB0(include_top=False, weights=weights,
+                                input_shape=(224, 224, 3),
+                                classes=1000, pooling=None,)
+    
+    elif model_type == 'B1':
+      self.net = EfficientNetB1(include_top=False, weights=weights,
+                                input_shape=(224, 224, 3),
+                                classes=1000, pooling=None,)
+    
+    elif model_type == 'B2':
+      self.net = EfficientNetB2(include_top=False, weights=weights,
+                                input_shape=(224, 224, 3),
+                                classes=1000, pooling=None,)
+    
+    elif model_type == 'B3':
+      self.net = EfficientNetB3(include_top=False, weights=weights,
+                                input_shape=(224, 224, 3),
+                                classes=1000, pooling=None,)
+      
+
+    elif model_type == 'B4':
+      self.net = EfficientNetB4(include_top=False, weights=weights,
+                                input_shape=(224, 224, 3),
+                                classes=1000, pooling=None,)
+    elif model_type == 'B5':
+      self.net = EfficientNetB5(include_top=False, weights=weights,
+                                input_shape=(224, 224, 3),
+                                classes=1000, pooling=None,)
+      
+    elif model_type == 'B6':
+      self.net = EfficientNetB6(include_top=False, weights=weights,
+                                input_shape=(224, 224, 3),
+                                classes=1000, pooling=None,)
+      
+    elif model_type == 'B7':
+      self.net = EfficientNetB7(include_top=False, weights=weights,
+                                input_shape=(224, 224, 3),
+                                classes=1000, pooling=None,)
+    else:
+      print('[WARNING]: FATAL! WRONG MODEL NAME. ABORT')
+      return None
+
+
     # C1 (1, 56, 56, 64)
     C1 = self.net.get_layer('block2a_activation').output
     C1 = keras.layers.Conv2D(64, (1, 1), activation='relu')(C1)
@@ -1114,8 +1167,7 @@ class EfficientNetBase(object):
         pass
     else:
         C5 = None
-    return [C1, C2, C3, C4, C5]
-
+    return [C1, C2, C3, C4, C5]    
 
 
 
@@ -2810,33 +2862,46 @@ class MaskRCNN():
         # Bottom-up Layers
         # Returns a list of the last layers of each stage, 5 in total.
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
-        if  self.model_name == "efficientnet":
+        # print(self.model_name[0:12].upper())
+        # print(self.model_name[0:7])
+
+        if  self.model_name[0:12].upper() == "EFFICIENTNET":
           if self.pretrained == 'True':
-              eff_base = EfficientNetBase(pretrained = True)
+              eff_base = EfficientNetBase(pretrained = True, model_type = self.model_name[13:].upper())
               # inputs = keras.layers.Input(shape=(224, 224, 3))
               # res_base = ResNestNetBase(pretrained=False)
               # inputs = keras.layers.Input(shape=(224, 224, 3))
               # res_base.resnest_graph(inputs, stage5=True)
           else:
            if self.pretrained == 'False':
-              eff_base = EfficientNetBase(pretrained = False)
+              eff_base = EfficientNetBase(pretrained = False, model_type = self.model_name[13:].upper())
+              
 
-          _, C2, C3, C4, C5 =  eff_base.efficientnet_graph(input_image, stage5=True,
+          _, C2, C3, C4, C5 =  eff_base.efficientnet_graph(input_image, stage5=True, 
                                                )
-        else:
-          if self.pretrained == 'True':
-
-              eff_base = EfficientNetBase(pretrained = True)
-              _, C2, C3, C4, C5 =  eff_base.efficientnet_graph(input_image, config.BACKBONE,)
+          
 
           else:
-              eff_base = EfficientNetBase(pretrained = False)
+              res_base = ResNestNetBase(pretrained=False, model_type = self.model_name.lower())
               # inputs = keras.layers.Input(shape=(224, 224, 3))
               # res_base.resnest_graph(inputs, stage5=True)
               # eff_base = EfficientNetBase(pretrained = self.pretrained)
               # inputs = keras.layers.Input(shape=(224, 224, 3))
-              _, C2, C3, C4, C5 =  eff_base.efficientnet_graph(input_image, config.BACKBONE,
+              _, C2, C3, C4, C5 =  res_base.resnest_graph(input_image, config.BACKBONE,
                                             )
+        else:
+          print(100*'-')
+          print('Please Choose the Right Model Name From the List')
+          print('EfficientNet : EfficientNet-B0', 'EfficientNet-B1', 'EfficientNet-B2'
+          'EfficientNet-B3', 'EfficientNet-B4', 'EfficientNet-B5', 'EfficientNet-B6'
+          'EfficientNet-B7')
+          print('ResNestNet : resnest50 , resnest101, resnest200, resnest269')
+          print(100*'-')
+          raise ValueError('Please Choose the Right Model Name From the List Above')
+        
+
+
+
             # print(100* 'Eff')                                 
 
         # Top-down Layers
