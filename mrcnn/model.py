@@ -2881,14 +2881,7 @@ class MaskRCNN():
                                                )
           
 
-          else:
-              res_base = ResNestNetBase(pretrained=False, model_type = self.model_name.lower())
-              # inputs = keras.layers.Input(shape=(224, 224, 3))
-              # res_base.resnest_graph(inputs, stage5=True)
-              # eff_base = EfficientNetBase(pretrained = self.pretrained)
-              # inputs = keras.layers.Input(shape=(224, 224, 3))
-              _, C2, C3, C4, C5 =  res_base.resnest_graph(input_image, config.BACKBONE,
-                                            )
+     
         else:
           print(100*'-')
           print('Please Choose the Right Model Name From the List')
